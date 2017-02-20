@@ -121,6 +121,12 @@ abstract class WsImportMojo
      */
     @Parameter( defaultValue = "${basedir}/src/jaxws" )
     protected File bindingDirectory;
+    
+    /**
+     * Directory containing global binding files
+     */
+    @Parameter
+    protected File globalBindingDirectory;
 
     /**
      * List of files to use for bindings. If not specified, all <code>.xml</code>
@@ -523,6 +529,13 @@ abstract class WsImportMojo
             args.add( "-b" );
             args.add( "'" + binding.getAbsolutePath() + "'" );
         }
+        
+        bindings = getGlobalBindingFiles();
+        for ( File binding : bindings )
+        {
+            args.add( "-b" );
+            args.add( "'" + binding.getAbsolutePath() + "'" );
+        }
 
         return args;
     }
@@ -561,6 +574,28 @@ abstract class WsImportMojo
         }
         return bindings;
     }
+    
+    /**
+    * Returns a file array of xml files to translate to object models.
+    * 
+    * @return An array of schema files to be parsed by the schema compiler.
+    */
+   public final File[] getGlobalBindingFiles()
+   {
+	   File[] bindings=null;
+	   if (globalBindingDirectory!=null) {
+		   getLog().debug( "The global binding Directory is " + globalBindingDirectory );
+	       bindings = bindingDirectory.listFiles( new XMLFile() );
+	       if ( bindings == null )
+	       {
+	           bindings = new File[0];
+	       }
+	   }
+	   if (bindings==null) {
+		   bindings = new File[0];
+	   }
+	   return bindings;
+   }
 
     /**
      * Returns a file array of wsdl files to translate to object models.
